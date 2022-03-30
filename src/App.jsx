@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import ListadoPacientes from "./components/ListadoPacientes";
 import { Formulario } from "./components/Formulario";
@@ -8,6 +8,31 @@ function App() {
 
   const [pacientes, setPacientes] = useState([]);
   const [paciente, setPaciente] = useState({});
+
+  /**
+   * se ejecuta una sola vez cuando se carga el componente, tmb los useEffect se ejecutan en orden definido
+   */
+  useEffect(() => {
+    const obtenerLS = () => {
+      // pone un arreglo vacio en localstorage
+      const pacientesLS = JSON.parse(localStorage.getItem("pacientes")) ?? [];
+      setPacientes(pacientesLS);
+      console.log(pacientesLS);
+    };
+
+    obtenerLS();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("pacientes", JSON.stringify(pacientes));
+  }, [pacientes]);
+
+  const eliminarPaciente = (id) => {
+    const pacientesActualizados = pacientes.filter(
+      (paciente) => paciente.id !== id
+    );
+    setPacientes(pacientesActualizados);
+  };
 
   return (
     // solo un elemento en el nivel mas alto
@@ -20,8 +45,13 @@ function App() {
           pacientes={pacientes}
           setPacientes={setPacientes}
           paciente={paciente}
+          setPaciente={setPaciente}
         />
-        <ListadoPacientes pacientes={pacientes} setPaciente={setPaciente} />
+        <ListadoPacientes
+          pacientes={pacientes}
+          setPaciente={setPaciente}
+          eliminarPaciente={eliminarPaciente}
+        />
       </div>
     </div>
   );
